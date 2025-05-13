@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cubo 2x2x2 Interactivo</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            display: block;
+        }
+        #toggleBtn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <button id="toggleBtn">Abrir / Cerrar</button>
+
+    <!-- Cargar la librería THREE.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+
+    <script>
+        // Configuración de la escena
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        let controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.set(4, 4, 6);
+        controls.enableDamping = true;
+
+        // Añadir luz a la escena
+        const light = new THREE.AmbientLight(0xffffff, 1.5);
+        scene.add(light);
+
+        // Crear el cubo 2x2x2
+        const cubeSize = 1;
+        const gap = 0.05;
+        const cubes = [];
+        const group = new THREE.Group();
+
+        const loader = new THREE.TextureLoader();
+
+        function createRandomMaterials(id) {
+            const materials = [];
+            for (let i = 0; i < 6; i++) {
+                const url = `https://source.unsplash.com/random/512x512?sig=${id * 10 + i}`;
+                const tex = loader.load(url);
+                materials.push(new THREE.MeshBasicMaterial({ map: tex }));
+            }
+            return materials;
+        }
+
+        for (let x = 0; x < 2; x++) {
+            for (let y = 0; y < 2; y++) {
+                for (let z = 0; z < 2; z++) {
+                    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+                    const index = cubes.length;
+                    const cube = new THREE.Mesh(geometry, createRandomMaterials(index));
+                    cube.userData.original = {
+                        x: (x - 0.5) * (cubeSize + gap),
+                        y: (y - 0.5) * (cubeSize + gap),
+                        z: (z - 0.5) * (cubeSize + gap),
+                    };
+                    cube.position.set(
+                        cube.userData.original.x,
+                        cube.userData.original.y,
+                        cube.userData.original.z
+                    );
+                    group.add(cube);
+                    cubes.push(cube);
+                }
+            }
+        }
+
+        scene.add(group);
+
+        // Añadir controles para interactuar con el cubo
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let lastTap = 0;
+
+        function onInteract(event) {
+            let x = event.clientX || event.touches?.[0]?.clientX;
+            let y = event.clientY || event.touches?.[0]?.clientY;
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(cubes);
+            if (intersects.length > 0) {
+                const obj = intersects[0].object;
+                gsap.to(obj.rotation, { y: obj.rotation.y + Math.PI / 2, duration: 0.5, ease: "power2.inOut" });
+            }
+        }
+
+        function onClickOrTap(event) {
+            const now = new Date().getTime();
+            if (event.type === "touchstart") {
+                if (now - lastTap < 300) {
+                    onInteract(event);
+                }
+                lastTap = now;
+            } else {
+                onInteract(event);
+            }
+        }
+
+        renderer.domElement.addEventListener('click', onClickOrTap);
+        renderer.domElement.addEventListener('touchstart', onClickOrTap);
+
+        // Función para abrir y cerrar el cubo
+        let opened = false;
+        document.getElementById('toggleBtn').addEventListener('click', () => {
+            opened = !opened;
+            for (let i = 0; i < cubes.length; i++) {
+                const cube = cubes[i];
+                if (opened) {
+                    const row = Math.floor(i / 4);
+                    const col = i % 4;
+                    gsap.to(cube.position, {
+                        x: (col - 1.5) * (cubeSize + gap),
+                        y: (0.5 - row) * (cubeSize + gap),
+                        z: 0,
+                        duration: 1,
+                        ease: "expo.inOut"
+                    });
+                } else {
+                    gsap.to(cube.position, {
+                        x: cube.userData.original.x,
+                        y: cube.userData.original.y,
+                        z: cube.userData.original.z,
+                        duration: 1,
+                        ease: "expo.inOut"
+                    });
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
