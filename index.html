@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Demo Cubo Básico</title>
+  <title>Demo Cubo con Textura</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
-    button { position: absolute; top: 10px; left: 10px; z-index: 10; }
+    #toggle { position: absolute; top: 10px; left: 10px; z-index: 10; }
   </style>
 </head>
 <body>
@@ -25,8 +25,14 @@
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
+    // Cargar la textura
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/5/57/Vincent_van_Gogh_-_The_Starry_Night_-_Google_Art_Project.jpg', () => {
+      renderer.render(scene, camera);
+    });
+
     const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshNormalMaterial();
+    const material = new THREE.MeshBasicMaterial({ map: texture });
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
 
@@ -40,4 +46,5 @@
   </script>
 </body>
 </html>
+
 
