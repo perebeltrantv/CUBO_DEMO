@@ -29,12 +29,11 @@
 <body>
     <button id="toggleBtn">Abrir / Cerrar</button>
 
-    <!-- Cargar la librería THREE.js -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
-
-    <script>
+    <!-- Importar Three.js y OrbitControls como módulos ES -->
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.150.0';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.150.0/examples/js/controls/OrbitControls.js';
+        
         // Configuración de la escena
         let scene = new THREE.Scene();
         let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -42,7 +41,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        let controls = new THREE.OrbitControls(camera, renderer.domElement);
+        let controls = new OrbitControls(camera, renderer.domElement);
         camera.position.set(4, 4, 6);
         controls.enableDamping = true;
 
