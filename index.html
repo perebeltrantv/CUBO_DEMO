@@ -58,13 +58,24 @@
 
         const loader = new THREE.TextureLoader();
 
-        function createRandomMaterials(id) {
+        // Imágenes de cuadros famosos
+        const images = [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/e/e1/Leonardo_da_Vinci_-_Mona_Lisa_%28c.%29_1503.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Edward_Hopper%2C_Nighthawks%2C_1942.jpg/800px-Edward_Hopper%2C_Nighthawks%2C_1942.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/f/f9/The_Scream.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Guernica_%28painting%29.jpg/800px-Guernica_%28painting%29.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/0/0b/Claude_Monet_-_Water_Lilies.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/7/79/La_Grande_Jatte_-_Seurat.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/6/6a/Edvard_Munch_-_The_Scream.jpg"
+        ];
+
+        function createMaterialsFromImages() {
             const materials = [];
-            for (let i = 0; i < 6; i++) {
-                const url = `https://source.unsplash.com/random/512x512?sig=${id * 10 + i}`;
-                const tex = loader.load(url);
+            images.forEach(image => {
+                const tex = loader.load(image);
                 materials.push(new THREE.MeshBasicMaterial({ map: tex }));
-            }
+            });
             return materials;
         }
 
@@ -73,7 +84,7 @@
                 for (let z = 0; z < 2; z++) {
                     const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
                     const index = cubes.length;
-                    const cube = new THREE.Mesh(geometry, createRandomMaterials(index));
+                    const cube = new THREE.Mesh(geometry, createMaterialsFromImages());
                     cube.userData.original = {
                         x: (x - 0.5) * (cubeSize + gap),
                         y: (y - 0.5) * (cubeSize + gap),
