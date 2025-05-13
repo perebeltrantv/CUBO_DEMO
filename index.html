@@ -2,17 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Demo Cubo</title>
+  <title>Demo Cubo Básico</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
+    button { position: absolute; top: 10px; left: 10px; z-index: 10; }
   </style>
 </head>
 <body>
   <button id="toggle">Abrir/Cerrar</button>
   <script type="module">
-    import * as THREE from 'https://cdn.skypack.dev/three';
-    import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -39,3 +40,4 @@
   </script>
 </body>
 </html>
+
